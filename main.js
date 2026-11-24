@@ -109,21 +109,11 @@ const videoCommand = require('./commands/video');
 // Global settings
 global.packname = settings.packname;
 global.author = settings.author;
-global.channelLink = "https://whatsapp.com/channel/0029Va90zAnIHphOuO8Msp3A";
-global.ytch = "Mr Unique Hacker";
+global.channelLink = settings.channelLink || "";
+global.ytch = settings.botOwner;
 
-// Add this near the top of main.js with other global configurations
-const channelInfo = {
-    contextInfo: {
-        forwardingScore: 1,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363161513685998@newsletter',
-            newsletterName: 'KnightBot MD',
-            serverMessageId: -1
-        }
-    }
-};
+const { channelInfo } = require('./lib/messageConfig');
+const { applyArabicAlias } = require('./lib/arabicAliases');
 
 async function handleMessages(sock, messageUpdate, printLog) {
     let chatId; // Define chatId outside try block
@@ -149,13 +139,16 @@ async function handleMessages(sock, messageUpdate, printLog) {
         const senderId = message.key.participant || message.key.remoteJid;
         const isGroup = chatId.endsWith('@g.us');
 
-        const userMessage = (
+        let userMessage = (
             message.message?.conversation?.trim() ||
             message.message?.extendedTextMessage?.text?.trim() ||
             message.message?.imageMessage?.caption?.trim() ||
             message.message?.videoMessage?.caption?.trim() ||
             ''
         ).toLowerCase().replace(/\.\s+/g, '.').trim();
+
+        // Bilingual commands: rewrite Arabic aliases to the English command token
+        userMessage = applyArabicAlias(userMessage);
 
         // Preserve raw message for commands like .tag that need original casing
         const rawText = message.message?.conversation?.trim() ||
@@ -908,7 +901,7 @@ async function handleGroupParticipantUpdate(sock, update) {
             const data = JSON.parse(fs.readFileSync('./data/userGroupData.json'));
             const welcomeData = data.welcome[id];
             const welcomeMessage = welcomeData?.message || 'Welcome {user} to the group! 🎉';
-            const channelId = welcomeData?.channelId || '120363161513685998@newsletter';
+            const channelId = welcomeData?.channelId || settings.channelJid;
 
             // Send welcome message for each new participant
             for (const participant of participants) {
@@ -926,7 +919,7 @@ async function handleGroupParticipantUpdate(sock, update) {
                         isForwarded: true,
                         forwardedNewsletterMessageInfo: {
                             newsletterJid: channelId,
-                            newsletterName: 'KnightBot MD',
+                            newsletterName: settings.channelName,
                             serverMessageId: -1
                         }
                     }
@@ -948,7 +941,7 @@ async function handleGroupParticipantUpdate(sock, update) {
             const data = JSON.parse(fs.readFileSync('./data/userGroupData.json'));
             const goodbyeData = data.goodbye[id];
             const goodbyeMessage = goodbyeData?.message || 'Goodbye {user} 👋';
-            const channelId = goodbyeData?.channelId || '120363161513685998@newsletter';
+            const channelId = goodbyeData?.channelId || settings.channelJid;
 
             // Send goodbye message for each leaving participant
             for (const participant of participants) {
@@ -965,7 +958,7 @@ async function handleGroupParticipantUpdate(sock, update) {
                         isForwarded: true,
                         forwardedNewsletterMessageInfo: {
                             newsletterJid: channelId,
-                            newsletterName: 'KnightBot MD',
+                            newsletterName: settings.channelName,
                             serverMessageId: -1
                         }
                     }
