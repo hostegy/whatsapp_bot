@@ -1,18 +1,7 @@
+const { channelInfo } = require('../lib/messageConfig');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-
-const channelInfo = {
-    contextInfo: {
-        forwardingScore: 999,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363161513685998@newsletter',
-            newsletterName: 'KnightBot MD',
-            serverMessageId: -1
-        }
-    }
-};
 
 async function clearSessionCommand(sock, chatId, msg) {
     try {
