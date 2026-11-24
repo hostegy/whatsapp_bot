@@ -1,3 +1,4 @@
+const { channelInfo } = require('../lib/messageConfig');
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const axios = require('axios');
 let sharp;
@@ -74,15 +75,7 @@ async function blurCommand(sock, chatId, message, quotedMessage) {
         await sock.sendMessage(chatId, {
             image: blurredImage,
             caption: '*[ ✔ ] Image Blurred Successfully*',
-            contextInfo: {
-                forwardingScore: 1,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363161513685998@newsletter',
-                    newsletterName: 'KnightBot MD',
-                    serverMessageId: -1
-                }
-            }
+            ...channelInfo
         });
 
     } catch (error) {
