@@ -10,7 +10,7 @@ const { channelInfo } = require('./lib/messageConfig');
  * - Baileys Library by @adiwajshing
  * - Pair Code implementation inspired by TechGod143 & DGXEON
  */
-require('./settings')
+const settings = require('./settings')
 const { Boom } = require('@hapi/boom')
 const fs = require('fs')
 const chalk = require('chalk')
@@ -81,13 +81,12 @@ const store = {
     }
 }
 
-let phoneNumber = "911234567890"
+let phoneNumber = (process.env.PAIRING_NUMBER || '').replace(/[^0-9]/g, '')
 let owner = JSON.parse(fs.readFileSync('./data/owner.json'))
 
 global.botname = settings.botName
 global.themeemoji = "•"
 
-const settings = require('./settings')
 const pairingCode = !!phoneNumber || process.argv.includes("--pairing-code")
 const useMobile = process.argv.includes("--mobile")
 
@@ -97,15 +96,16 @@ const question = (text) => {
     if (rl) {
         return new Promise((resolve) => rl.question(text, resolve))
     } else {
-        // In non-interactive environment, use ownerNumber from settings
-        return Promise.resolve(settings.ownerNumber || phoneNumber)
+        // Pairing identity is separate from the owner/admin identity.
+        if (!phoneNumber) throw new Error('Set PAIRING_NUMBER to the bot WhatsApp number before starting without a terminal')
+        return Promise.resolve(phoneNumber)
     }
 }
 
 
 async function startXeonBotInc() {
     let { version, isLatest } = await fetchLatestBaileysVersion()
-    const { state, saveCreds } = await useMultiFileAuthState(`./session`)
+    const { state, saveCreds } = await useMultiFileAuthState(process.env.SESSION_DIR || './session')
     const msgRetryCounterCache = new NodeCache()
 
     const XeonBotInc = makeWASocket({
