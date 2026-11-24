@@ -1,3 +1,4 @@
+const { channelInfo } = require('./lib/messageConfig');
 /**
  * Knight Bot - A WhatsApp Bot
  * Copyright (c) 2024 Professor
@@ -83,7 +84,7 @@ const store = {
 let phoneNumber = "911234567890"
 let owner = JSON.parse(fs.readFileSync('./data/owner.json'))
 
-global.botname = "KNIGHT BOT"
+global.botname = settings.botName
 global.themeemoji = "•"
 
 const settings = require('./settings')
@@ -150,15 +151,7 @@ async function startXeonBotInc() {
                 if (mek.key && mek.key.remoteJid) {
                     await XeonBotInc.sendMessage(mek.key.remoteJid, {
                         text: '❌ An error occurred while processing your message.',
-                        contextInfo: {
-                            forwardingScore: 1,
-                            isForwarded: true,
-                            forwardedNewsletterMessageInfo: {
-                                newsletterJid: '120363161513685998@newsletter',
-                                newsletterName: 'KnightBot MD',
-                                serverMessageId: -1
-                            }
-                        }
+                        ...channelInfo
                     }).catch(console.error);
                 }
             }
@@ -251,35 +244,39 @@ async function startXeonBotInc() {
 
             const botNumber = XeonBotInc.user.id.split(':')[0] + '@s.whatsapp.net';
             await XeonBotInc.sendMessage(botNumber, {
-                text: `🤖 Bot Connected Successfully!\n\n⏰ Time: ${new Date().toLocaleString()}\n✅ Status: Online and Ready!
-                \n✅Make sure to join below channel`,
-                contextInfo: {
-                    forwardingScore: 1,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363161513685998@newsletter',
-                        newsletterName: 'KnightBot MD',
-                        serverMessageId: -1
-                    }
-                }
+                text: `🤖 تم تشغيل البوت بنجاح | Bot Connected\n\n⏰ ${new Date().toLocaleString()}\n✅ جاهز للعمل | Online and Ready` + (settings.channelLink ? `\n📢 قناتنا | Our channel:\n${settings.channelLink}` : ''),
+                ...channelInfo
             });
 
-            const knightbotstart = '120363161513685998@newsletter';
-            try {
-                if (typeof XeonBotInc.newsletterFollow === 'function') {
-                    await XeonBotInc.newsletterFollow(knightbotstart);
-                } else {
-                    console.log('Newsletter follow function not available in this Baileys version');
+            // Follow the OWNER's own channel on connect (user-requested feature).
+            // Resolves the internal newsletter JID from the public invite code via
+            // Baileys metadata; follows only a verified @newsletter id of the
+            // configured channel, never any hardcoded or fallback channel.
+            if (settings.autoFollowChannel) {
+                try {
+                    let jid = settings.channelJid;
+                    if (!jid && settings.channelInviteCode && typeof XeonBotInc.newsletterMetadata === 'function') {
+                        const meta = await XeonBotInc.newsletterMetadata('invite', settings.channelInviteCode);
+                        if (meta && typeof meta.id === 'string' && meta.id.endsWith('@newsletter')) {
+                            jid = meta.id;
+                        }
+                    }
+                    if (jid && jid.endsWith('@newsletter') && typeof XeonBotInc.newsletterFollow === 'function') {
+                        await XeonBotInc.newsletterFollow(jid);
+                        console.log(chalk.green(`Following owner channel: ${jid}`));
+                    } else {
+                        console.log('Owner channel follow skipped: JID unresolved or unsupported');
+                    }
+                } catch (error) {
+                    console.log('Owner channel follow failed:', error.message);
                 }
-            } catch (error) {
-                console.log('Newsletter follow failed:', error.message);
             }
 
             await delay(1999)
-            console.log(chalk.yellow(`\n\n                  ${chalk.bold.blue(`[ ${global.botname || 'KNIGHT BOT'} ]`)}\n\n`))
+            console.log(chalk.yellow(`\n\n                  ${chalk.bold.blue(`[ ${global.botname || 'MK Digital'} ]`)}\n\n`))
             console.log(chalk.cyan(`< ================================================== >`))
-            console.log(chalk.magenta(`\n${global.themeemoji || '•'} YT CHANNEL: MR UNIQUE HACKER`))
-            console.log(chalk.magenta(`${global.themeemoji || '•'} GITHUB: mrunqiuehacker`))
+            console.log(chalk.magenta(`\n${global.themeemoji || '•'} CHANNEL: ${settings.channelLink || 'not set'}`))
+            console.log(chalk.magenta(`${global.themeemoji || '•'} GITHUB: hostegy/whatsapp_bot (fork of mruniquehacker/Knightbot-MD)`))
             console.log(chalk.magenta(`${global.themeemoji || '•'} WA NUMBER: ${owner}`))
             console.log(chalk.magenta(`${global.themeemoji || '•'} CREDIT: MR UNIQUE HACKER`))
             console.log(chalk.green(`${global.themeemoji || '•'} 🤖 Bot Connected Successfully! ✅`))
