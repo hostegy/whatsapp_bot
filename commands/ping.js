@@ -21,7 +21,7 @@ function formatTime(seconds) {
 async function pingCommand(sock, chatId, message) {
     try {
         const start = Date.now();
-        await sock.sendMessage(chatId, { text: 'Pong!' }, { quoted: message });
+        await sock.sendMessage(chatId, { text: 'بونج! | Pong!' }, { quoted: message });
         const end = Date.now();
         const ping = Math.round((end - start) / 2);
 
@@ -29,10 +29,10 @@ async function pingCommand(sock, chatId, message) {
         const uptimeFormatted = formatTime(uptimeInSeconds);
 
         const botInfo = `
-┏━━〔 🤖 Kenny Bot 〕━━┓
-┃ 🚀 Ping     : ${ping} ms
-┃ ⏱️ Uptime   : ${uptimeFormatted}
-┃ 🔖 Version  : v${settings.version}
+┏━━〔 🤖 ${settings.botName} 〕━━┓
+┃ 🚀 البنج | Ping : ${ping} ms
+┃ ⏱️ مدة التشغيل | Uptime : ${uptimeFormatted}
+┃ 🔖 الإصدار | Version : v${settings.version}
 ┗━━━━━━━━━━━━━━━━━━━┛`.trim();
 
         // Reply to the original message with the bot info
