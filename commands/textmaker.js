@@ -1,3 +1,4 @@
+const settings = require('../settings');
 const axios = require('axios');
 const mumaker = require('mumaker');
 
@@ -6,8 +7,8 @@ const channelInfo = {
     forwardingScore: 1,
     isForwarded: true,
     forwardedNewsletterMessageInfo: {
-        newsletterJid: '120363161513685998@newsletter',
-        newsletterName: 'KnightBot MD',
+        newsletterJid: settings.channelJid,
+        newsletterName: settings.channelName,
         serverMessageId: -1
     }
 };
