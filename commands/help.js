@@ -1,155 +1,129 @@
 const settings = require('../settings');
-const fs = require('fs');
-const path = require('path');
 
 async function helpCommand(sock, chatId, message) {
     const helpMessage = `
-╔═══════════════════╗
-   *🤖 ${settings.botName || 'Kinyua BOT'}*  
-   by ${settings.botOwner || 'Wambugu Kinyua'}
-╚═══════════════════╝
+*🤖 ${settings.botName}*
+${settings.botOwner}
 
-*Available Commands:*
+*الأوامر بالعربي والإنجليزي | Arabic & English commands*
 
-╔═══════════════════╗
-🌐 *General Commands*:
-║ ➤ .help or .menu
-║ ➤ .ping
-║ ➤ .alive
-║ ➤ .tts <text>
-║ ➤ .owner
-║ ➤ .joke
-║ ➤ .quote
-║ ➤ .fact
-║ ➤ .weather <city>
-║ ➤ .news
-║ ➤ .attp <text>
-║ ➤ .lyrics <song_title>
-║ ➤ .8ball <question>
-║ ➤ .groupinfo
-║ ➤ .staff or .admins 
-║ ➤ .vv
-║ ➤ .trt <text> <lang>
-║ ➤ .ss <link>
-║ ➤ .jid
-║ ➤ .qr generate <text>
-║ ➤ .qr scan (reply to image)
-║ ➤ .proxy
-║ ➤ .tempmail <generate/inbox/read>
-╚═══════════════════╝ 
+🌐 *عام | General*
+➤ .منيو | .menu
+➤ .بنج | .ping
+➤ .شغال | .alive
+➤ .نطق | .tts
+➤ .المالك | .owner
+➤ .نكتة | .joke
+➤ .اقتباس | .quote
+➤ .معلومة | .fact
+➤ .طقس | .weather
+➤ .اخبار | .news
+➤ .كلمات | .lyrics
+➤ .الجروب | .groupinfo
+➤ .المشرفين | .staff
+➤ .ترجمة | .trt
+➤ .تصوير | .ss
+➤ .باركود | .qr
+➤ .بريد | .tempmail
 
-╔═══════════════════╗
-👮‍♂️ *Admin Commands*:
-║ ➤ .ban @user
-║ ➤ .promote @user
-║ ➤ .demote @user
-║ ➤ .mute <minutes>
-║ ➤ .unmute
-║ ➤ .delete or .del
-║ ➤ .kick @user
-║ ➤ .warnings @user
-║ ➤ .warn @user
-║ ➤ .antilink
-║ ➤ .antibadword
-║ ➤ .clear
-║ ➤ .tag <message>
-║ ➤ .tagall
-║ ➤ .chatbot
-║ ➤ .resetlink
-║ ➤ .welcome <on/off>
-║ ➤ .goodbye <on/off>
-║ ➤ .reminder <set/list/delete>
-╚═══════════════════╝
+👮‍♂️ *إدارة الجروب | Admin*
+➤ .حظر | .ban
+➤ .فك-الحظر | .unban
+➤ .ترقية | .promote
+➤ .تنزيل | .demote
+➤ .كتم | .mute
+➤ .الغاء-الكتم | .unmute
+➤ .امسح | .delete
+➤ .طرد | .kick
+➤ .تحذير | .warn
+➤ .تحذيرات | .warnings
+➤ .مضاد-الروابط | .antilink
+➤ .مضاد-السب | .antibadword
+➤ .منشن | .tag
+➤ .الكل | .tagall
+➤ .رد-تلقائي | .chatbot
+➤ .رابط-جديد | .resetlink
+➤ .ترحيب | .welcome
+➤ .وداع | .goodbye
+➤ .تذكير | .reminder
 
-╔═══════════════════╗
-🔒 *Owner Commands*:
-║ ➤ .mode
-║ ➤ .autostatus
-║ ➤ .clearsession
-║ ➤ .antidelete
-║ ➤ .cleartmp
-║ ➤ .setpp <reply to image>
-║ ➤ .autoreact
-╚═══════════════════╝
+🔒 *المالك | Owner*
+➤ .وضع | .mode
+➤ .ستوري-تلقائي | .autostatus
+➤ .مسح-الجلسة | .clearsession
+➤ .مضاد-الحذف | .antidelete
+➤ .صورة-البوت | .setpp
+➤ .مسح-المؤقت | .cleartmp
+➤ .تفاعل-تلقائي | .autoreact
 
-╔═══════════════════╗
-🎨 *Image/Sticker Commands*:
-║ ➤ .blur <image>
-║ ➤ .simage <reply to sticker>
-║ ➤ .sticker <reply to image>
-║ ➤ .tgsticker <Link>
-║ ➤ .take <packname> 
-║ ➤ .emojimix <emj1>+<emj2>
-╚═══════════════════╝  
+🎨 *ملصقات وصور | Stickers & Images*
+➤ .ملصق | .sticker
+➤ .صورة | .simage
+➤ .بلور | .blur
+➤ .ايموجي | .emojimix
+➤ .خذ | .take
+➤ .ملصق-تليجرام | .tgsticker
 
-╔═══════════════════╗
-🎮 *Game Commands*:
-║ ➤ .tictactoe @user
-║ ➤ .hangman
-║ ➤ .guess <letter>
-║ ➤ .trivia
-║ ➤ .answer <answer>
-║ ➤ .truth
-║ ➤ .dare
-╚═══════════════════╝
+🎮 *ألعاب | Games*
+➤ .اكس-او | .tictactoe
+➤ .خمن | .guess
+➤ .اسئلة | .trivia
+➤ .اجابة | .answer
+➤ .صراحة | .truth
+➤ .تحدي | .dare
+➤ .حبل-المشنقة | .hangman
 
-╔═══════════════════╗
-🤖 *AI Commands*:
-║ ➤ .gpt <question>
-║ ➤ .grok <question>
-║ ➤ .gemini <question>
-║ ➤ .ask <question> (reply to msg)
-║ ➤ .imagine <prompt>
-║ ➤ .flux <prompt>
-╚═══════════════════╝
+🤖 *ذكاء اصطناعي | AI*
+➤ .ذكاء | .gpt
+➤ .اسأل | .ask
+➤ .تخيل | .imagine
+➤ .جروك | .grok
+➤ .جيميني | .gemini
+➤ .فلكس | .flux
 
-╔═══════════════════╗
-🔍 *Search Commands*:
-║ ➤ .google <query>
-║ ➤ .apk <app name>
-║ ➤ .playstore <app name>
-╚═══════════════════╝
+🔍 *بحث | Search*
+➤ .جوجل | .google
+➤ .تطبيق | .apk
+➤ .متجر | .playstore
 
-╔═══════════════════╗
-🎯 *Fun Commands*:
-║ ➤ .compliment @user
-║ ➤ .insult @user
-║ ➤ .flirt 
-║ ➤ .goodnight
-║ ➤ .roseday
-║ ➤ .character @user
-║ ➤ .wasted @user
-║ ➤ .ship @user
-║ ➤ .simp @user
-║ ➤ .stupid @user [text]
-╚═══════════════════╝
-╔═══════════════════╗
-📥 *Downloader*:
-║ ➤ .play <song_name>
-║ ➤ .instagram <link>
-║ ➤ .facebook <link>
-║ ➤ .tiktok <link>
-║ ➤ .video <song name>
-║ ➤ .ytmp4 <Link>
-╚═══════════════════╝
-╔═══════════════════╗
-💻 *Github Commands:*
-║ ➤ .git
-║ ➤ .github
-║ ➤ .sc
-║ ➤ .script
-║ ➤ .repo
-╚═══════════════════╝
+🎯 *ترفيه | Fun*
+➤ .مجاملة | .compliment
+➤ .مغازلة | .flirt
+➤ .شخصية | .character
+➤ .توافق | .ship
+➤ .تصبح-على-خير | .goodnight
+➤ .اهانة | .insult
+➤ .يوم-الورد | .roseday
+➤ .محروق | .wasted
+➤ .منافق | .simp
+➤ .غبي | .stupid
+➤ .ميم | .meme
+➤ .توقع | .8ball
+➤ .نص-متحرك | .attp
 
-╔═══════════════════╗
-💱 *Converter & Tools:*
-║ ➤ .convert currency <amount> <from> <to>
-║ ➤ .convert length <amount> <from> <to>
-║ ➤ .convert weight <amount> <from> <to>
-║ ➤ .convert temp <amount> <from> <to>
-║ ➤ .convert volume <amount> <from> <to>
-║ ➤ .convert area <amount> <from> <to>
-╚═══════════════════╝`;
+📥 *تحميل | Downloader*
+➤ .تشغيل | .play
+➤ .صوت | .ytmp3
+➤ .فيديو | .video
+➤ .انستا | .instagram
+➤ .فيسبوك | .facebook
+➤ .تيكتوك | .tiktok
+
+✍️ *خطوط | Text Styles*
+➤ .نيون | .neon
+➤ .نار | .fire
+➤ .ثلج | .snow
+➤ .معدني | .metallic
+➤ .خلل | .glitch
+➤ .هاكر | .hacker
+
+🔗 *ربط ومعلومات | Pairing & Info*
+➤ .ربط | .pair
+➤ .جيت | .github
+➤ .سورس | .repo
+➤ .convert
+
+${settings.channelLink ? '📢 ' + settings.channelLink : ''}`.trim();
 
     try {
         await sock.sendMessage(chatId, { text: helpMessage });
