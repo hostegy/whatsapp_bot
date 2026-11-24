@@ -1,3 +1,9 @@
+> **MK Digital fork (by hostegy):** customized from the original Knight Bot (credits below).
+> - Branding, owner and channel point to MK Digital / المهندس محمد كمال (see `settings.js`, overridable via env, `.env.example`).
+> - Commands work in Arabic and English: `.منيو` == `.menu` (alias map in `lib/arabicAliases.js`).
+> - Removed: automatic channel following on connect, the developer's channel advertising, and the external pairing service (`.pair` now generates codes locally).
+> - The bot never subscribes the linked account to any channel.
+
 # 🤖 Knight Bot Kenny revised
 
 > A powerful, feature-rich WhatsApp bot built on Baileys library for comprehensive group management and entertainment. This enhanced version includes advanced features, improved stability, and extensive customization options.
