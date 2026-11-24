@@ -49,7 +49,13 @@ async function stickerTelegramCommand(sock, chatId, msg) {
         const packName = args[0].replace("https://t.me/addstickers/", "");
 
         // Using working bot token
-        const botToken = '7801479976:AAGuPL0a7kXXBYz6XUSR_ll2SR5V_W6oHl4';
+        // Token moved to settings (env TELEGRAM_BOT_TOKEN). The previously
+        // hardcoded third-party bot token was removed.
+        const botToken = settings.telegramBotToken;
+        if (!botToken) {
+            await sock.sendMessage(chatId, { text: 'أمر ملصقات تيليجرام غير مفعّل: لم يتم ضبط TELEGRAM_BOT_TOKEN | Telegram sticker command is not configured (TELEGRAM_BOT_TOKEN missing).' }, { quoted: message });
+            return;
+        }
 
         try {
             // Fetch sticker pack info
